@@ -81,34 +81,35 @@ int main(int argc, const char *argv[])
         //// STUDENT ASSIGNMENT
         //// TASK MP.2 -> add the following keypoint detectors in file matching2D.cpp and enable string-based selection based on detectorType
         //// -> HARRIS, FAST, BRISK, ORB, AKAZE, SIFT
+        bool kptVis = false;
 
         if (detectorType.compare("SHITOMASI") == 0)
         {
-            detKeypointsShiTomasi(keypoints, imgGray, true);
+            detKeypointsShiTomasi(keypoints, imgGray, kptVis);
         }
         else if (detectorType.compare("HARRIS") == 0)
         {
-            detKeypointsHarris(keypoints, imgGray, true);
+            detKeypointsHarris(keypoints, imgGray, kptVis);
         }
         else if (detectorType.compare("FAST") == 0)
         {
-            detKeypointsFAST(keypoints, imgGray, true);
+            detKeypointsFAST(keypoints, imgGray, kptVis);
         }
         else if (detectorType.compare("BRISK") == 0)
         {
-            detKeypointsBRISK(keypoints, imgGray, true);
+            detKeypointsBRISK(keypoints, imgGray, kptVis);
         }
         else if (detectorType.compare("ORB") == 0)
         {
-            detKeypointsORB(keypoints, imgGray, true);
+            detKeypointsORB(keypoints, imgGray, kptVis);
         }
         else if (detectorType.compare("AKAZE") == 0)
         {
-            detKeypointsAKAZE(keypoints, imgGray, true);
+            detKeypointsAKAZE(keypoints, imgGray, kptVis);
         }
         else if (detectorType.compare("SIFT") == 0)
         {
-            detKeypointsSIFT(keypoints, imgGray, true);
+            detKeypointsSIFT(keypoints, imgGray, kptVis);
         }
         //// EOF STUDENT ASSIGNMENT
 
@@ -120,7 +121,14 @@ int main(int argc, const char *argv[])
         cv::Rect vehicleRect(535, 180, 180, 150);
         if (bFocusOnVehicle)
         {
-            // ...
+            for (size_t i = 0; i < keypoints.size(); i++)
+            {
+                if (!vehicleRect.contains(keypoints[i].pt))
+                {
+                    keypoints.erase(keypoints.begin() + i);
+                    i--;
+                }
+            }
         }
 
         //// EOF STUDENT ASSIGNMENT
@@ -185,7 +193,7 @@ int main(int argc, const char *argv[])
             cout << "#4 : MATCH KEYPOINT DESCRIPTORS done" << endl;
 
             // visualize matches between current and previous image
-            bVis = false;
+            bVis = true;
             if (bVis)
             {
                 cv::Mat matchImg = ((dataBuffer.end() - 1)->cameraImg).clone();
