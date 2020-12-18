@@ -86,10 +86,10 @@ void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descr
     }
 
     // perform feature description
-    double t = (double)cv::getTickCount();
+    // double t = (double)cv::getTickCount();
     extractor->compute(img, keypoints, descriptors);
-    t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
-    cout << descriptorType << " descriptor extraction in " << 1000 * t / 1.0 << " ms" << endl;
+    // t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
+    // cout << descriptorType << " descriptor extraction in " << 1000 * t / 1.0 << " ms" << endl;
 }
 
 // Detect keypoints in image using the traditional Shi-Thomasi detector
@@ -105,7 +105,7 @@ void detKeypointsShiTomasi(vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool b
     double k = 0.04;
 
     // Apply corner detection
-    double t = (double)cv::getTickCount();
+    // double t = (double)cv::getTickCount();
     vector<cv::Point2f> corners;
     cv::goodFeaturesToTrack(img, corners, maxCorners, qualityLevel, minDistance, cv::Mat(), blockSize, false, k);
 
@@ -118,8 +118,6 @@ void detKeypointsShiTomasi(vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool b
         newKeyPoint.size = blockSize;
         keypoints.push_back(newKeyPoint);
     }
-    t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
-    cout << "Shi-Tomasi detection with n=" << keypoints.size() << " keypoints in " << 1000 * t / 1.0 << " ms" << endl;
 
     // visualize results
     if (bVis)
@@ -194,81 +192,40 @@ void detKeypointsHarris(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool
     }
 }
 
-void detKeypointsFAST(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool bVis)
+void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, std::string detectorType, bool bVis)
 {
-    int threshold = 30;
-    bool nonmaxSuppression = true;
-    cv::FAST(img, keypoints, threshold, nonmaxSuppression, cv::FastFeatureDetector::TYPE_9_16);
+    cv::Ptr<cv::FeatureDetector> detector;
 
-    if (bVis)
+    if (detectorType.compare("FAST") == 0)
     {
-        cv::Mat visImage = img.clone();
-        cv::drawKeypoints(img, keypoints, visImage, cv::Scalar(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-        string windowName = "FAST Detector Results";
-        cv::namedWindow(windowName, 1);
-        imshow(windowName, visImage);
-        cv::waitKey(0);
+        int threshold = 30;
+        bool nonmaxSuppression = true;
+        cv::FAST(img, keypoints, threshold, nonmaxSuppression, cv::FastFeatureDetector::TYPE_9_16);
     }
-}
+    else if (detectorType.compare("BRISK") == 0)
+    {
+        detector = cv::BRISK::create();
+    }
+    else if (detectorType.compare("ORB") == 0)
+    {
+        detector = cv::ORB::create();
+    }
+    else if (detectorType.compare("AKAZE") == 0)
+    {
+        detector = cv::AKAZE::create();
+    }
+    else if (detectorType.compare("SIFT") == 0)
+    {
+        detector = cv::SIFT::create();
+    }
 
-void detKeypointsBRISK(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool bVis)
-{
-    cv::Ptr<cv::BRISK> detector = cv::BRISK::create();
     detector->detect(img, keypoints);
 
     if (bVis)
     {
         cv::Mat visImage = img.clone();
         cv::drawKeypoints(img, keypoints, visImage, cv::Scalar(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-        string windowName = "BRISK Detector Results";
-        cv::namedWindow(windowName, 1);
-        imshow(windowName, visImage);
-        cv::waitKey(0);
-    }
-}
-
-void detKeypointsORB(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool bVis)
-{
-    cv::Ptr<cv::ORB> detector = cv::ORB::create();
-    detector->detect(img, keypoints);
-
-    if (bVis)
-    {
-        cv::Mat visImage = img.clone();
-        cv::drawKeypoints(img, keypoints, visImage, cv::Scalar(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-        string windowName = "ORB Detector Results";
-        cv::namedWindow(windowName, 1);
-        imshow(windowName, visImage);
-        cv::waitKey(0);
-    }
-}
-
-void detKeypointsAKAZE(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool bVis)
-{
-    cv::Ptr<cv::AKAZE> detector = cv::AKAZE::create();
-    detector->detect(img, keypoints);
-
-    if (bVis)
-    {
-        cv::Mat visImage = img.clone();
-        cv::drawKeypoints(img, keypoints, visImage, cv::Scalar(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-        string windowName = "AKAZE Detector Results";
-        cv::namedWindow(windowName, 1);
-        imshow(windowName, visImage);
-        cv::waitKey(0);
-    }
-}
-
-void detKeypointsSIFT(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool bVis)
-{
-    cv::Ptr<cv::SIFT> detector = cv::SIFT::create();
-    detector->detect(img, keypoints);
-
-    if (bVis)
-    {
-        cv::Mat visImage = img.clone();
-        cv::drawKeypoints(img, keypoints, visImage, cv::Scalar(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-        string windowName = "SIFT Detector Results";
+        string windowName = detectorType + " Detector Results";
         cv::namedWindow(windowName, 1);
         imshow(windowName, visImage);
         cv::waitKey(0);
