@@ -6,7 +6,7 @@
 
 Implement a vector for dataBuffer objects whose size does not exceed 3.
 
-```
+```c++
 if (dataBuffer.size() > dataBufferSize)
 {
     dataBuffer.erase(dataBuffer.begin());
@@ -17,7 +17,7 @@ if (dataBuffer.size() > dataBufferSize)
 
 Implement detectors: Harris, FAST, BRISK, ORB, AKAZE, and SIFT. Make them selectable by setting a string accordingly.
 
-```
+```c++
 cv::Ptr<cv::FeatureDetector> detector;
 
 if (detectorType.compare("FAST") == 0)
@@ -50,7 +50,7 @@ detector->detect(img, keypoints);
 
 Remove all keypoints outside a pre-defined rectangle and only use the keypoints within the rectangle for further processing.
 
-```
+```c++
 bool bFocusOnVehicle = true;
 cv::Rect vehicleRect(535, 180, 180, 150);
 if (bFocusOnVehicle)
@@ -70,7 +70,7 @@ if (bFocusOnVehicle)
 
 Implement descriptors BRIEF, ORB, FREAK, AKAZE, AND SIFT. Make them selectable by setting a string accordingly.
 
-```
+```c++
 cv::Ptr<cv::DescriptorExtractor> extractor;
 if (descriptorType.compare("BRISK") == 0)
 {
@@ -109,7 +109,7 @@ extractor->compute(img, keypoints, descriptors);
 
 Implement FLANN based matching.
 
-```
+```c++
 bool crossCheck = false;
 cv::Ptr<cv::DescriptorMatcher> matcher;
 
@@ -133,7 +133,7 @@ else if (matcherType.compare("MAT_FLANN") == 0)
 
 Implement K-nearest-neighbor matching with distance ratio test, which looks at the ratio of best vs. second-best match to decide whether to keep and associated pare of keypoints.
 
-```
+```c++
 if (selectorType.compare("SEL_NN") == 0)
 { // nearest neighbor (best match)
 
@@ -175,19 +175,11 @@ The table shows the average keypoints amount for different detectors. Harris cor
 
 #### Distribution of neighborhood
 
-###### Harris
+**Harris**, **Shi-Tomasi**, and **FAST** have relatively small neighborhood size and special distribution with no overlapping with each other.
 
-###### Shi-Tomasi
+However, **BRISK** and **ORB** have very large neighborhood size and compact distribution like cluster with many overlapping with each other.
 
-###### FAST
-
-###### BRISK
-
-###### ORB
-
-###### AKAZE
-
-###### SIFT
+**AKAZE** and **SIFT** have medium neighborhood size and relatively uniform distribution with small amount overlapping to each other.
 
 ### MP.8 Performance Evaluation 2
 
