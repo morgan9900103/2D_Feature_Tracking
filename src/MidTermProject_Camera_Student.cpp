@@ -4,6 +4,7 @@
 #include <sstream>
 #include <iomanip>
 #include <vector>
+#include <deque>
 #include <cmath>
 #include <limits>
 #include <opencv2/core.hpp>
@@ -37,7 +38,7 @@ int main(int argc, const char *argv[])
 
     // misc
     int dataBufferSize = 3;       // no. of images which are held in memory (ring buffer) at the same time
-    vector<DataFrame> dataBuffer; // list of data frames which are held in memory at the same time
+    deque<DataFrame> dataBuffer; // list of data frames which are held in memory at the same time
     bool bVis = false;            // visualize results
 
     /* MAIN LOOP OVER ALL IMAGES */
@@ -65,7 +66,7 @@ int main(int argc, const char *argv[])
         dataBuffer.push_back(frame);
         if (dataBuffer.size() > dataBufferSize)
         {
-            dataBuffer.erase(dataBuffer.begin());
+            dataBuffer.pop_front();
         }
 
         //// EOF STUDENT ASSIGNMENT
@@ -107,14 +108,13 @@ int main(int argc, const char *argv[])
         cv::Rect vehicleRect(535, 180, 180, 150);
         if (bFocusOnVehicle)
         {
-            for (size_t i = 0; i < keypoints.size(); i++)
+            vector<cv::KeyPoint> vehicleKpts;
+            for (auto kpt: keypoints)
             {
-                if (!vehicleRect.contains(keypoints[i].pt))
-                {
-                    keypoints.erase(keypoints.begin() + i);
-                    i--;
-                }
+                if (vehicleRect.contains(kpt.pt))
+                    vehicleKpts.push_back(kpt);
             }
+            keypoints = vehicleKpts;
         }
         cout << "keypoints count: " << keypoints.size() << endl;
 
