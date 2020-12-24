@@ -198,9 +198,7 @@ void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, std:
 
     if (detectorType.compare("FAST") == 0)
     {
-        int threshold = 30;
-        bool nonmaxSuppression = true;
-        cv::FAST(img, keypoints, threshold, nonmaxSuppression, cv::FastFeatureDetector::TYPE_9_16);
+        detector = cv::FastFeatureDetector::create();
     }
     else if (detectorType.compare("BRISK") == 0)
     {
